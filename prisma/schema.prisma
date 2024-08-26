@@ -1,0 +1,137 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         Int     @id @default(autoincrement())
+  name       String
+  email      String  @unique
+  password   String
+  occupation String
+  avatar     String?
+  public_id  String?
+  role       Role    @default(user)
+
+  orders    Order[]
+  mycourses MyCourse[]
+}
+
+model Category {
+  id           Int    @id @default(autoincrement())
+  nameCategory String
+
+  courses Course[]
+}
+
+model Course {
+  id          Int     @id @default(autoincrement())
+  name        String
+  thumbnail   String?
+  public_id   String?
+  type        Type
+  status      Status  @default(inactive)
+  price       Int
+  description String
+  level       String
+  mentor_id   Int
+  category_id Int
+
+  Mentor   Mentor   @relation(fields: [mentor_id], references: [id])
+  Category Category @relation(fields: [category_id], references: [id])
+
+  chapters  Chapter[]
+  orders    Order[]
+  mycourses MyCourse[]
+}
+
+model Lesson {
+  id         Int    @id @default(autoincrement())
+  name       String
+  video      String
+  chapter_id Int
+
+  Chapter Chapter @relation(fields: [chapter_id], references: [id])
+}
+
+model Mentor {
+  id         Int     @id @default(autoincrement())
+  name       String
+  avatar     String?
+  public_id  String?
+  email      String  @unique
+  profession String?
+
+  courses Course[]
+}
+
+model Chapter {
+  id        Int    @id @default(autoincrement())
+  name      String
+  course_id Int
+
+  Course Course @relation(fields: [course_id], references: [id])
+
+  lessons Lesson[]
+}
+
+model Order {
+  id           Int     @id @default(autoincrement())
+  status       String? @default("pending")
+  order_id     String?
+  gross_amount Int?    @default(0)
+  price        Int?    @default(0)
+  email        String?
+  name         String?
+  user_id      Int?
+  order_item   Int?
+
+  User   User?   @relation(fields: [user_id], references: [id])
+  Course Course? @relation(fields: [order_item], references: [id])
+}
+
+model Transaction {
+  id                 Int     @id @default(autoincrement())
+  transaction_status String? @default("pending")
+  transaction_id     String?
+  order_id_midtrans  String?
+  gross_amount       Int?    @default(0)
+  payment_type       String?
+  fraud_status       String?
+  status_code        String?
+  transaction_time   String?
+}
+
+model MyCourse {
+  id        Int  @id @default(autoincrement())
+  user_id   Int?
+  course_id Int?
+
+  User   User?   @relation(fields: [user_id], references: [id])
+  Course Course? @relation(fields: [course_id], references: [id])
+}
+
+enum Role {
+  admin
+  user
+}
+
+enum Status {
+  active
+  inactive
+}
+
+enum Type {
+  premium
+  free
+}
