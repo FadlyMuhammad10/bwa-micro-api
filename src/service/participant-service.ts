@@ -17,7 +17,7 @@ export default class ParticipantService {
   }
 
   static async getCourseById(id: number) {
-    const courses = await prisma.course.findMany({
+    const courses = await prisma.course.findFirst({
       where: {
         id: id,
         status: "active",
