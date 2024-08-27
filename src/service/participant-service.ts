@@ -17,7 +17,7 @@ export default class ParticipantService {
   }
 
   static async getCourseById(id: number) {
-    const courses = await prisma.course.findFirst({
+    const course = await prisma.course.findUnique({
       where: {
         id: id,
         status: "active",
@@ -32,6 +32,7 @@ export default class ParticipantService {
         Mentor: true,
       },
     });
-    return courses;
+
+    return course;
   }
 }
