@@ -26,7 +26,11 @@ export default class ParticipantService {
         Category: true,
         chapters: {
           include: {
-            lessons: true,
+            lessons: {
+              orderBy: {
+                id: "asc",
+              },
+            },
           },
         },
         Mentor: true,
